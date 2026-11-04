@@ -63,6 +63,37 @@ Well Mart is a full server-rendered marketplace where **sellers** list products 
 
 ## 🏗️ Architecture
 
+### System design
+
+```mermaid
+flowchart TB
+    subgraph Users["Roles - multi-guard auth"]
+        C["Customer"]
+        S["Seller"]
+        D["Delivery Man"]
+        A["Admin"]
+    end
+    subgraph Laravel["Laravel 10 Monolith"]
+        Ctrl["Controllers (per guard)"]
+        Models["Eloquent Models"]
+        Jobs["Queued Jobs + Notifications"]
+    end
+    DB[("MySQL")]
+    Algolia["Algolia Search"]
+    SSL["SSLCommerz Payment"]
+    Pusher["Pusher - Chatify chat"]
+
+    C --> Ctrl
+    S --> Ctrl
+    D --> Ctrl
+    A --> Ctrl
+    Ctrl --> Models --> DB
+    Ctrl --> Jobs
+    Ctrl -->|search| Algolia
+    Ctrl -->|checkout| SSL
+    Ctrl -->|realtime chat| Pusher
+```
+
 A classic **Laravel MVC monolith** serving role-based server-rendered views plus a small JSON API.
 
 ```
